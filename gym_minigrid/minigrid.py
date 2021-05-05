@@ -1,4 +1,5 @@
 import math
+import hashlib
 import gym
 from enum import IntEnum
 import numpy as np
@@ -173,7 +174,7 @@ class Floor(WorldObj):
 
     def render(self, img):
         # Give the floor a pale color
-        color = COLORS[self.color] / 2        
+        color = COLORS[self.color] / 2
         fill_coords(img, point_in_rect(0.031, 1, 0.031, 1), color)
 
 
@@ -664,6 +665,8 @@ class MiniGridEnv(gym.Env):
         self.action_space = spaces.Discrete(len(self.actions))
 
         # Number of cells (width and height) in the agent view
+        assert agent_view_size % 2 == 1
+        assert agent_view_size >= 3
         self.agent_view_size = agent_view_size
 
         # Observations are dictionaries containing an
@@ -732,6 +735,18 @@ class MiniGridEnv(gym.Env):
         # Seed the random number generator
         self.np_random, _ = seeding.np_random(seed)
         return [seed]
+
+    def hash(self, size=16):
+        """Compute a hash that uniquely identifies the current state of the environment.
+        :param size: Size of the hashing
+        """
+        sample_hash = hashlib.sha256()
+
+        to_encode = [self.grid.encode(), self.agent_pos, self.agent_dir]
+        for item in to_encode:
+            sample_hash.update(str(item).encode('utf8'))
+
+        return sample_hash.hexdigest()[:size]
 
     @property
     def steps_remaining(self):
@@ -1274,7 +1289,12 @@ class MiniGridEnv(gym.Env):
         )
 
         if mode == 'human':
-            self.window.show_img(img)
             self.window.set_caption(self.mission)
+            self.window.show_img(img)
 
         return img
+
+    def close(self):
+        if self.window:
+            self.window.close()
+        return

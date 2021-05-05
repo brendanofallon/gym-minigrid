@@ -31,6 +31,15 @@ Please use this bibtex if you want to cite this repository in your publications:
 ```
 
 List of publications & submissions using MiniGrid or BabyAI (please open a pull request to add missing entries):
+- [SPOTTER: Extending Symbolic Planning Operators through Targeted Reinforcement Learning](http://www.ifaamas.org/Proceedings/aamas2021/pdfs/p1118.pdf) (Tufts University, SIFT, AAMAS 2021)
+- [Grid-to-Graph: Flexible Spatial Relational Inductive Biases for Reinforcement Learning](https://arxiv.org/abs/2102.04220) (UCL, AAMAS 2021)
+- [Rank the Episodes: A Simple Approach for Exploration in Procedurally-Generated Environments](https://openreview.net/forum?id=MtEE0CktZht) (Texas A&M University, Kuai Inc., ICLR 2021)
+- [Adversarially Guided Actor-Critic](https://openreview.net/forum?id=_mQp5cr_iNy) (INRIA, Google Brain, ICLR 2021)
+- [BeBold: Exploration Beyond the Boundary of Explored Regions](https://arxiv.org/pdf/2012.08621.pdf) (UCB, December 2020)
+- [Approximate Information State for Approximate Planning and Reinforcement Learning in Partially Observed Systems](https://arxiv.org/abs/2010.08843) (McGill, October 2020)
+- [Prioritized Level Replay](https://arxiv.org/pdf/2010.03934.pdf) (FAIR, October 2020)
+- [AllenAct: A Framework for Embodied AI Research](https://arxiv.org/pdf/2008.12760.pdf) (Allen Institute for AI, August 2020)
+- [Learning with AMIGO: Adversarially Motivated Intrinsic Goals](https://arxiv.org/pdf/2006.12122.pdf) (MIT, FAIR, ICLR 2021)
 - [RIDE: Rewarding Impact-Driven Exploration for Procedurally-Generated Environments](https://openreview.net/forum?id=rkg-TJBFPB) (FAIR, ICLR 2020)
 - [Learning to Request Guidance in Emergent Communication](https://arxiv.org/pdf/1912.05525.pdf) (University of Amsterdam, Dec 2019)
 - [Working Memory Graphs](https://arxiv.org/abs/1911.07141) (MSR, Nov 2019)
@@ -149,11 +158,16 @@ Actions in the basic environment:
 - Toggle (open doors, interact with objects)
 - Done (task completed, optional)
 
+Default tile/observation encoding:
+- Each tile is encoded as a 3 dimensional tuple: (OBJECT_IDX, COLOR_IDX, STATE) 
+- OBJECT_TO_IDX and COLOR_TO_IDX mapping can be found in [gym_minigrid/minigrid.py](gym_minigrid/minigrid.py)
+- e.g. door STATE -> 0: open, 1: closed, 2: locked
+
 By default, sparse rewards are given for reaching a green goal tile. A
 reward of 1 is given for success, and zero for failure. There is also an
 environment-specific time step limit for completing the task.
 You can define your own reward function by creating a class derived
-from `MiniGridEnv`. Extending the environment with new object types or action
+from `MiniGridEnv`. Extending the environment with new object types or new actions
 should be very easy. If you wish to do this, you should take a look at the
 [gym_minigrid/minigrid.py](gym_minigrid/minigrid.py) source file.
 
@@ -284,13 +298,10 @@ Registered configurations:
 - `MiniGrid-RedBlueDoors-6x6-v0`
 - `MiniGrid-RedBlueDoors-8x8-v0`
 
-The purpose of this environment is to test memory.
 The agent is randomly placed within a room with one red and one blue door
 facing opposite directions. The agent has to open the red door and then open
-the blue door, in that order.  The agent, when facing one door, cannot see
-the door behind him. Hence, the agent needs to remember whether or not he has
-previously opened the other door in order to reliably succeed at completing
-the task.
+the blue door, in that order. Note that, surprisingly, this environment is
+solvable without memory.
 
 ### Memory environment
 
@@ -299,8 +310,6 @@ Registered configurations:
 - `MiniGrid-MemoryS13Random-v0`
 - `MiniGrid-MemoryS13-v0`
 - `MiniGrid-MemoryS11-v0`
-- `MiniGrid-MemoryS9-v0`
-- `MiniGrid-MemoryS7-v0`
 
 This environment is a memory test. The agent starts in a small room
 where it sees an object. It then has to go through a narrow hallway
@@ -410,10 +419,6 @@ Registered configurations:
   <img src="figures/ObstructedMaze-2Q.png" width="250">
   <img src="figures/ObstructedMaze-4Q.png" width="250">
 </p>
-
-The agent has to pick up a box which is placed in a corner of a 3x3 maze.
-The doors are locked, the keys are hidden in boxes and doors are obstructed
-by balls. This environment can be solved without relying on language.
 
 The agent has to pick up a box which is placed in a corner of a 3x3 maze.
 The doors are locked, the keys are hidden in boxes and doors are obstructed
