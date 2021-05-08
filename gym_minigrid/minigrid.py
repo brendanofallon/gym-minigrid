@@ -210,6 +210,7 @@ class Wall(WorldObj):
     def render(self, img):
         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
 
+
 class Door(WorldObj):
     def __init__(self, color, is_open=False, is_locked=False):
         super().__init__('door', color)

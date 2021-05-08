@@ -21,7 +21,8 @@ class MultiRoomEnv(MiniGridEnv):
     def __init__(self,
         minNumRooms,
         maxNumRooms,
-        maxRoomSize=10
+        maxRoomSize=10,
+        doorsOpen=False,
     ):
         assert minNumRooms > 0
         assert maxNumRooms >= minNumRooms
@@ -30,6 +31,7 @@ class MultiRoomEnv(MiniGridEnv):
         self.minNumRooms = minNumRooms
         self.maxNumRooms = maxNumRooms
         self.maxRoomSize = maxRoomSize
+        self.doorsOpen = doorsOpen
 
         self.rooms = []
 
@@ -101,7 +103,7 @@ class MultiRoomEnv(MiniGridEnv):
                 # This is needed because Python's set is not deterministic
                 doorColor = self._rand_elem(sorted(doorColors))
 
-                entryDoor = Door(doorColor)
+                entryDoor = Door(doorColor, is_open=self.doorsOpen, is_locked=not self.doorsOpen)
                 self.grid.set(*room.entryDoorPos, entryDoor)
                 prevDoorColor = doorColor
 
@@ -258,6 +260,22 @@ class MultiRoomEnvN6(MultiRoomEnv):
             minNumRooms=6,
             maxNumRooms=6
         )
+
+class MultiRoomOpenDoorN2(MultiRoomEnv):
+
+    def __init__(self, minNumRooms=2, maxNumRooms=2):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=5,
+            doorsOpen=True,
+        )
+
+
+register(
+    id='MiniGrid-MultiRoom-OpenDoor-N2-S5-v0',
+    entry_point='gym_minigrid.envs:MultiRoomOpenDoorN2'
+)
 
 register(
     id='MiniGrid-MultiRoom-N2-S4-v0',
