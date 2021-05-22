@@ -651,13 +651,19 @@ class MiniGridEnv(gym.Env):
         max_steps=100,
         see_through_walls=False,
         seed=1337,
-        agent_view_size=7
+        agent_view_size=7,
+        obs_as_dict=True,
     ):
         # Can't set both grid_size and width/height
         if grid_size:
             assert width == None and height == None
             width = grid_size
             height = grid_size
+
+        # Whether the observation should be returned as a dictionary including the
+        # "message", which can break some agent implementations (but is required for
+        # certain environments)
+        self.obs_as_dict = obs_as_dict
 
         # Action enumeration for this environment
         self.actions = MiniGridEnv.Actions
@@ -1207,17 +1213,19 @@ class MiniGridEnv(gym.Env):
 
         assert hasattr(self, 'mission'), "environments must define a textual mission string"
 
-        # Observations are dictionaries containing:
-        # - an image (partially observable view of the environment)
-        # - the agent's direction/orientation (acting as a compass)
-        # - a textual mission string (instructions for the agent)
-        obs = {
-            'image': image,
-            'direction': self.agent_dir,
-            'mission': self.mission
-        }
-
-        return obs
+        if self.obs_as_dict:
+            # Observations are dictionaries containing:
+            # - an image (partially observable view of the environment)
+            # - the agent's direction/orientation (acting as a compass)
+            # - a textual mission string (instructions for the agent)
+            obs = {
+                'image': image,
+                'direction': self.agent_dir,
+                'mission': self.mission
+            }
+            return obs
+        else:
+            return image
 
     def get_obs_render(self, obs, tile_size=TILE_PIXELS//2):
         """
