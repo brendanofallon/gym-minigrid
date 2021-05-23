@@ -145,7 +145,7 @@ class MultiGoalEnv(MultiRoomEnv):
         return obs, reward, done, info
 
 
-class MultiGoalOpenDoorN3(MultiGoalEnv):
+class MultiGoalOpenDoorN3S5(MultiGoalEnv):
 
     def __init__(self, minNumRooms=3, maxNumRooms=3):
         super().__init__(
@@ -156,8 +156,34 @@ class MultiGoalOpenDoorN3(MultiGoalEnv):
             doorsOpen=True,
         )
 
+class MultiGoalOpenDoorN3S8(MultiGoalEnv):
+
+    def __init__(self, minNumRooms=3, maxNumRooms=3):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=8,
+            numGoals=3,
+            doorsOpen=True,
+        )
+
+class MultiGoalOpenDoorN4S8(MultiGoalEnv):
+
+    def __init__(self, minNumRooms=4, maxNumRooms=4):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=8,
+            numGoals=4,
+            doorsOpen=True,
+        )
 
 register(
     id='MiniGrid-MultiGoal-G3-N3-S5-v0',
     entry_point='gym_minigrid.envs:MultiGoalOpenDoorN3'
+)
+
+register(
+    id='MiniGrid-MultiGoal-G4-N4-S8-v0',
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4'
 )
