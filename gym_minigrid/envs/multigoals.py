@@ -180,10 +180,15 @@ class MultiGoalOpenDoorN4S8(MultiGoalEnv):
 
 register(
     id='MiniGrid-MultiGoal-G3-N3-S5-v0',
-    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN3'
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN3S5'
+)
+
+register(
+    id='MiniGrid-MultiGoal-G3-N3-S8-v0',
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN3S8'
 )
 
 register(
     id='MiniGrid-MultiGoal-G4-N4-S8-v0',
-    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4'
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
 )
