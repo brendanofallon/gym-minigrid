@@ -111,7 +111,10 @@ class MultiGoalEnv(MultiRoomEnv):
         for g in range(self.numGoals):
             #pick a random room...
             room = random.choice(roomList)
-            self.goal_pos = self.place_obj(Goal(), room.top, room.size)
+            try:
+                self.goal_pos = self.place_obj(Goal(), room.top, room.size, max_tries=1000)
+            except RecursionError:
+                pass
 
         self.mission = 'traverse the rooms to get to the goals'
 
