@@ -26,7 +26,7 @@ class MultiGoalEnv(MultiRoomEnv):
         self.maxNumRooms = maxNumRooms
         self.maxRoomSize = maxRoomSize
         self.doorsOpen = doorsOpen
-
+        self.goals_consumed = 0
         self.rooms = []
 
         super(MultiRoomEnv, self).__init__(
@@ -35,6 +35,7 @@ class MultiGoalEnv(MultiRoomEnv):
         )
 
     def _gen_grid(self, width, height):
+        self.goals_consumed = 0
         roomList = []
 
         # Choose a random number of rooms to generate
@@ -136,10 +137,11 @@ class MultiGoalEnv(MultiRoomEnv):
                 reward = 1.0 / self.numGoals * self._reward()
                 # Make the goal disappear
                 self.grid.set(*fwd_pos, None)
+                self.goals_consumed += 1
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
 
-        done = done or (self.step_count == self.max_steps)
+        done = done or (self.step_count == self.max_steps) or (self.goals_consumed == self.numGoals)
         return obs, reward, done, info
 
 
