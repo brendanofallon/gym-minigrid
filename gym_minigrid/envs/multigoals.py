@@ -114,6 +114,33 @@ class MultiGoalEnv(MultiRoomEnv):
 
         self.mission = 'traverse the rooms to get to the goals'
 
+    def step(self, action):
+        # Invalid action
+        if action >= self.action_space.n:
+            raise NotImplementedError("Action outside action space bounds")
+
+        # Get the position in front of the agent
+        fwd_pos = self.front_pos
+
+        # Get the contents of the cell in front of the agent
+        fwd_cell = self.grid.get(*fwd_pos)
+
+        # Update the agent's position/direction
+        obs, reward, done, info = MiniGridEnv.step(self, action)
+        done = False
+        # If the agent tried to walk over an obstacle or wall
+        if action == self.actions.forward:
+            if fwd_cell == None or fwd_cell.can_overlap():
+                self.agent_pos = fwd_pos
+            if fwd_cell != None and fwd_cell.type == 'goal':
+                reward = 1.0 / self.numGoals * self._reward()
+                # Make the goal disappear
+                self.grid.set(*fwd_pos, None)
+            if fwd_cell != None and fwd_cell.type == 'lava':
+                done = True
+
+        done = done or (self.step_count == self.max_steps)
+        return obs, reward, done, info
 
 
 class MultiGoalOpenDoorN3(MultiGoalEnv):
