@@ -292,6 +292,16 @@ class MultiRoomOpenDoorN4(MultiRoomEnv):
             doorsOpen=True,
         )
 
+class MultiRoomOpenDoorN4S8(MultiRoomEnv):
+
+    def __init__(self, minNumRooms=4, maxNumRooms=4):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=8,
+            doorsOpen=True,
+        )
+
 register(
     id='MiniGrid-MultiRoom-OpenDoor-N4-S5-v0',
     entry_point='gym_minigrid.envs:MultiRoomOpenDoorN4'
@@ -315,6 +325,11 @@ register(
 register(
     id='MiniGrid-MultiRoom-N4-S5-v0',
     entry_point='gym_minigrid.envs:MultiRoomEnvN4S5'
+)
+
+register(
+    id='MiniGrid-MultiRoom-N4-S8-v0',
+    entry_point='gym_minigrid.envs:MultiRoomOpenDoorN4S8'
 )
 
 register(
