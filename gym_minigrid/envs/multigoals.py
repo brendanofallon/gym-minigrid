@@ -193,7 +193,39 @@ class MultiGoalOpenDoorG10N8S10(MultiGoalEnv):
             doorsOpen=True,
         )
 
+class MultiGoalOpenDoorG6N6S8(MultiGoalEnv):
 
+    def __init__(self, minNumRooms=6, maxNumRooms=6):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=8,
+            numGoals=6,
+            doorsOpen=True,
+        )
+
+
+class MultiGoalOpenDoorG6N6S10(MultiGoalEnv):
+
+    def __init__(self, minNumRooms=6, maxNumRooms=6):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=10,
+            numGoals=6,
+            doorsOpen=True,
+        )
+
+class MultiGoalOpenDoorG8N8S8(MultiGoalEnv):
+
+    def __init__(self, minNumRooms=8, maxNumRooms=8):
+        super().__init__(
+            minNumRooms=minNumRooms,
+            maxNumRooms=maxNumRooms,
+            maxRoomSize=8,
+            numGoals=8,
+            doorsOpen=True,
+        )
 
 class MultiGoalOpenDoorN8S10(MultiGoalEnv):
 
@@ -223,17 +255,17 @@ register(
 
 register(
     id='MiniGrid-MultiGoal-G6-N6-S8-v0',
-    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorG6N6N4S8'
 )
 
 register(
     id='MiniGrid-MultiGoal-G6-N6-S10-v0',
-    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorG6N6S10'
 )
 
 register(
     id='MiniGrid-MultiGoal-G8-N8-S8-v0',
-    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorG8N8S8'
 )
 
 register(
