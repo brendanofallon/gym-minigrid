@@ -222,6 +222,21 @@ register(
 )
 
 register(
+    id='MiniGrid-MultiGoal-G6-N6-S8-v0',
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
+)
+
+register(
+    id='MiniGrid-MultiGoal-G6-N6-S10-v0',
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
+)
+
+register(
+    id='MiniGrid-MultiGoal-G8-N8-S8-v0',
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorN4S8'
+)
+
+register(
     id='MiniGrid-MultiGoal-G10-N8-S10-v0',
     entry_point='gym_minigrid.envs:MultiGoalOpenDoorG10N8S10'
 )
