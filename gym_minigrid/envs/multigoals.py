@@ -255,7 +255,7 @@ register(
 
 register(
     id='MiniGrid-MultiGoal-G6-N6-S8-v0',
-    entry_point='gym_minigrid.envs:MultiGoalOpenDoorG6N6N4S8'
+    entry_point='gym_minigrid.envs:MultiGoalOpenDoorG6N6S8'
 )
 
 register(
