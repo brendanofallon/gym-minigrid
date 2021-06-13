@@ -12,6 +12,8 @@ TILE_PIXELS = 32
 
 # Map of color names to RGB values
 COLORS = {
+    'magenta': np.array([204, 0, 170]),
+    'orange': np.array([230, 153, 0]),
     'red'   : np.array([255, 0, 0]),
     'green' : np.array([0, 255, 0]),
     'blue'  : np.array([0, 0, 255]),
@@ -29,7 +31,9 @@ COLOR_TO_IDX = {
     'blue'  : 2,
     'purple': 3,
     'yellow': 4,
-    'grey'  : 5
+    'grey'  : 5,
+    'magenta': 6,
+    'orange': 7,
 }
 
 IDX_TO_COLOR = dict(zip(COLOR_TO_IDX.values(), COLOR_TO_IDX.keys()))
@@ -615,6 +619,7 @@ class Grid:
 
         return mask
 
+
 class MiniGridEnv(gym.Env):
     """
     2D grid world game environment
@@ -696,7 +701,6 @@ class MiniGridEnv(gym.Env):
         # Current position and direction of the agent
         self.agent_pos = None
         self.agent_dir = None
-
         # Initialize the RNG
         self.seed(seed=seed)
 
