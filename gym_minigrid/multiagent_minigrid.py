@@ -15,11 +15,30 @@ from .rendering import *
 
 class Agent(minigrid.WorldObj):
 
+    count = 0
+
+    def __new__(cls, *args, **kwargs):
+        cls.count += 1
+        return super(Agent, cls).__new__(cls, *args, **kwargs)
+
     def __init__(self, color='magenta'):
         super().__init__('agent', color)
+        self.count = Agent.count
         self.dir = None
-        self.carrying = False
+        self.carrying = None
         self.view_size = 7
+
+    def encode(self):
+        """Encode the a description of this object as a 3-tuple of integers"""
+        return (minigrid.OBJECT_TO_IDX[self.type], self.dir, self.count)
+
+    def can_overlap(self):
+        """Can the agent overlap with this?"""
+        return False
+
+    def can_pickup(self):
+        """Can the agent pick this up?"""
+        return False
 
     def render(self, img):
         """Draw this object with the given renderer"""
@@ -171,10 +190,12 @@ class MultiAgentMiniGridEnv(gym.Env):
         # Initialize the RNG
         self.seed(seed=seed)
 
+        self.init_num_agents = None
         # Initialize the state
         self.reset()
 
-    def reset(self, agents=None):
+
+    def reset(self):
         # Current position and direction of the agent
         self.agents = agents
 
@@ -186,14 +207,13 @@ class MultiAgentMiniGridEnv(gym.Env):
         # Check that the agent doesn't overlap with an object
         for agent in agents:
             start_cell = self.grid.get(*agent.cur_pos)
-            assert start_cell is None or start_cell.can_overlap()
+            assert start_cell is agent
 
         # Step count since episode start
         self.step_count = 0
 
         # Return first observation
-        obs = self.gen_obs()
-        return obs
+        return [(agent, self.gen_obs(agent)) for agent in self.agents]
 
     def seed(self, seed=1337):
         # Seed the random number generator
@@ -420,7 +440,7 @@ class MultiAgentMiniGridEnv(gym.Env):
         agent,
         top=None,
         size=None,
-        rand_dir=True,
+        dir=None,
         max_tries=math.inf
     ):
         """
@@ -428,63 +448,12 @@ class MultiAgentMiniGridEnv(gym.Env):
         """
         if agent not in self.agents:
             self.agents.append(agent)
-
+        if dir is None:
+            dir = self._rand_int(0, 4)
+        assert dir >=0 and dir < 4, f"Invalid agent direction {dir}"
+        agent.dir = dir
         pos = self.place_obj(agent, top, size, max_tries=max_tries)
         return pos
-
-    # @property
-    # def dir_vec(self, agent):
-    #     """
-    #     Get the direction vector for the agent, pointing in the direction
-    #     of forward movement.
-    #     """
-    #
-    #     assert agent.dir >= 0 and agent.dir < 4
-    #     return minigrid.DIR_TO_VEC[agent.dir]
-
-    # @property
-    # def right_vec(self):
-    #     """
-    #     Get the vector pointing to the right of the agent.
-    #     """
-    #
-    #     dx, dy = self.dir_vec
-    #     return np.array((-dy, dx))
-    #
-    # @property
-    # def front_pos(self):
-    #     """
-    #     Get the position of the cell that is right in front of the agent
-    #     """
-    #
-    #     return self.agent_pos + self.dir_vec
-    #
-    # def get_view_coords(self, i, j):
-    #     """
-    #     Translate and rotate absolute grid coordinates (i, j) into the
-    #     agent's partially observable view (sub-grid). Note that the resulting
-    #     coordinates may be negative or outside of the agent's view size.
-    #     """
-    #
-    #     ax, ay = self.agent_pos
-    #     dx, dy = self.dir_vec
-    #     rx, ry = self.right_vec
-    #
-    #     # Compute the absolute coordinates of the top-left view corner
-    #     sz = self.agent_view_size
-    #     hs = self.agent_view_size // 2
-    #     tx = ax + (dx * (sz-1)) - (rx * hs)
-    #     ty = ay + (dy * (sz-1)) - (ry * hs)
-    #
-    #     lx = i - tx
-    #     ly = j - ty
-    #
-    #     # Project the coordinates of the object relative to the top-left
-    #     # corner onto the agent's own coordinate system
-    #     vx = (rx*lx + ry*ly)
-    #     vy = -(dx*lx + dy*ly)
-    #
-    #     return vx, vy
 
     def get_view_exts(self, position, direction, view_size=7):
         """
@@ -557,9 +526,10 @@ class MultiAgentMiniGridEnv(gym.Env):
 
         reward = 0
         done = False
-
+        ai = self.agents.index(agent)
+        print(f"Agent {ai} (cur_pos: {agent.cur_pos}) is executing action {action}")
         # Get the position in front of the agent
-        fwd_pos = self.front_pos
+        fwd_pos = agent.front_pos
 
         # Get the contents of the cell in front of the agent
         fwd_cell = self.grid.get(*fwd_pos)
@@ -572,32 +542,35 @@ class MultiAgentMiniGridEnv(gym.Env):
 
         # Rotate right
         elif action == self.actions.right:
-            agent.dir = (self.agent_dir + 1) % 4
+            agent.dir = (agent.dir + 1) % 4
 
         # Move forward
         elif action == self.actions.forward:
             if fwd_cell == None or fwd_cell.can_overlap():
+                self.grid.set(*agent.cur_pos, None)
                 agent.cur_pos = fwd_pos
+                self.grid.set(*agent.cur_pos, agent)
             if fwd_cell != None and fwd_cell.type == 'goal':
                 done = True
                 reward = self._reward()
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
 
+
         # Pick up an object
         elif action == self.actions.pickup:
             if fwd_cell and fwd_cell.can_pickup():
                 if agent.carrying is None:
                     agent.carrying = fwd_cell
-                    self.carrying.cur_pos = np.array([-1, -1])
+                    agent.carrying.cur_pos = np.array([-1, -1])
                     self.grid.set(*fwd_pos, None)
 
         # Drop an object
         elif action == self.actions.drop:
-            if not fwd_cell and self.carrying:
-                self.grid.set(*fwd_pos, self.carrying)
-                self.carrying.cur_pos = fwd_pos
-                self.carrying = None
+            if not fwd_cell and agent.carrying:
+                self.grid.set(*fwd_pos, agent.carrying)
+                agent.carrying.cur_pos = fwd_pos
+                agent.carrying = None
 
         # Toggle/activate an object
         elif action == self.actions.toggle:
@@ -625,11 +598,11 @@ class MultiAgentMiniGridEnv(gym.Env):
         cells the agent can actually see.
         """
 
-        topX, topY, botX, botY = self.get_view_exts(agent.pos, agent.dir, agent.view_size)
+        topX, topY, botX, botY = self.get_view_exts(agent.cur_pos, agent.dir, agent.view_size)
 
         grid = self.grid.slice(topX, topY, agent.view_size, agent.view_size)
 
-        for i in range(self.agent_dir + 1):
+        for i in range(agent.dir + 1):
             grid = grid.rotate_left()
 
         # Process occluders and visibility
@@ -706,37 +679,37 @@ class MultiAgentMiniGridEnv(gym.Env):
             self.window = gym_minigrid.window.Window('gym_minigrid')
             self.window.show(block=False)
 
-        #TODO Do this for each agent...
-
-        # Compute which cells are visible to the agent
-        _, vis_mask = self.gen_obs_grid()
-
-        # Compute the world coordinates of the bottom-left corner
-        # of the agent's view area
-        f_vec = self.dir_vec
-        r_vec = self.right_vec
-        top_left = self.agent_pos + f_vec * (self.agent_view_size-1) - r_vec * (self.agent_view_size // 2)
 
         # Mask of which cells to highlight
         highlight_mask = np.zeros(shape=(self.width, self.height), dtype=np.bool)
 
-        # For each cell in the visibility mask
-        for vis_j in range(0, self.agent_view_size):
-            for vis_i in range(0, self.agent_view_size):
-                # If this cell is not visible, don't highlight it
-                if not vis_mask[vis_i, vis_j]:
-                    continue
+        for agent in self.agents:
+            # Compute which cells are visible to the agent
+            _, vis_mask = self.gen_obs_grid(agent)
 
-                # Compute the world coordinates of this cell
-                abs_i, abs_j = top_left - (f_vec * vis_j) + (r_vec * vis_i)
+            # Compute the world coordinates of the bottom-left corner
+            # of the agent's view area
+            f_vec = agent.dir_vec
+            r_vec = agent.right_vec
+            top_left = agent.cur_pos + f_vec * (self.agent_view_size-1) - r_vec * (self.agent_view_size // 2)
 
-                if abs_i < 0 or abs_i >= self.width:
-                    continue
-                if abs_j < 0 or abs_j >= self.height:
-                    continue
+            # For each cell in the visibility mask
+            for vis_j in range(0, self.agent_view_size):
+                for vis_i in range(0, self.agent_view_size):
+                    # If this cell is not visible, don't highlight it
+                    if not vis_mask[vis_i, vis_j]:
+                        continue
 
-                # Mark this cell to be highlighted
-                highlight_mask[abs_i, abs_j] = True
+                    # Compute the world coordinates of this cell
+                    abs_i, abs_j = top_left - (f_vec * vis_j) + (r_vec * vis_i)
+
+                    if abs_i < 0 or abs_i >= self.width:
+                        continue
+                    if abs_j < 0 or abs_j >= self.height:
+                        continue
+
+                    # Mark this cell to be highlighted
+                    highlight_mask[abs_i, abs_j] = True
 
         # Render the whole grid
         img = self.grid.render(

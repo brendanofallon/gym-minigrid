@@ -9,14 +9,16 @@ class MAEmptyEnv(MultiAgentMiniGridEnv):
 
     def __init__(
         self,
-        size,
+        width,
+        height,
         num_agents=2,
     ):
-        self.num_agents = num_agents
+        self.init_num_agents = num_agents
 
         super().__init__(
-            grid_size=size,
-            max_steps=100*size*size,
+            width=width,
+            height=height,
+            max_steps=100*width*height,
             # Set this to True for maximum speed
             see_through_walls=True
         )
@@ -32,7 +34,7 @@ class MAEmptyEnv(MultiAgentMiniGridEnv):
         self.put_obj(Goal(), width - 2, height - 2)
 
         # Place the agents
-        for i in range(self.num_agents):
+        for i in range(self.init_num_agents):
             a = Agent()
             self.agents.append(a)
             self.place_agent(a)
@@ -42,5 +44,12 @@ class MAEmptyEnv(MultiAgentMiniGridEnv):
 
 class MAEmptyEnv6x6(MAEmptyEnv):
     def __init__(self):
-        super().__init__(size=6,
+        super().__init__(width=6,
+                         height=6,
                          num_agents=2)
+
+
+register(
+    id='MiniGrid-MultiAgent-Empty-6x6-N2-v0',
+    entry_point='gym_minigrid.envs:MAEmptyEnv6x6'
+)
