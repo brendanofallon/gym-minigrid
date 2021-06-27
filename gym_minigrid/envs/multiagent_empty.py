@@ -13,14 +13,13 @@ class MAEmptyEnv(MultiAgentMiniGridEnv):
         height,
         num_agents=2,
     ):
-        self.init_num_agents = num_agents
-
         super().__init__(
             width=width,
             height=height,
             max_steps=100*width*height,
             # Set this to True for maximum speed
-            see_through_walls=True
+            see_through_walls=True,
+            init_num_agents=num_agents,
         )
 
     def _gen_grid(self, width, height):

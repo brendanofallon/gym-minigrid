@@ -142,7 +142,8 @@ class MultiAgentMiniGridEnv(gym.Env):
         max_steps=100,
         see_through_walls=False,
         seed=1337,
-        agent_view_size=7
+        agent_view_size=7,
+        init_num_agents=None,
     ):
         # Can't set both grid_size and width/height
         if grid_size:
@@ -190,14 +191,13 @@ class MultiAgentMiniGridEnv(gym.Env):
         # Initialize the RNG
         self.seed(seed=seed)
 
-        self.init_num_agents = None
+        self.init_num_agents = init_num_agents
         # Initialize the state
         self.reset()
 
-
     def reset(self):
         # Current position and direction of the agent
-        self.agents = agents
+        self.agents = []
 
         # Generate a new random grid at the start of each episode
         # To keep the same grid for each episode, call env.seed() with
@@ -205,7 +205,7 @@ class MultiAgentMiniGridEnv(gym.Env):
         self._gen_grid(self.width, self.height)
 
         # Check that the agent doesn't overlap with an object
-        for agent in agents:
+        for agent in self.agents:
             start_cell = self.grid.get(*agent.cur_pos)
             assert start_cell is agent
 
