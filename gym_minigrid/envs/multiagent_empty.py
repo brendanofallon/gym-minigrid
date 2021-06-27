@@ -47,8 +47,18 @@ class MAEmptyEnv6x6(MAEmptyEnv):
                          height=6,
                          num_agents=2)
 
+class MAEmptyEnv12x12(MAEmptyEnv):
+    def __init__(self):
+        super().__init__(width=12,
+                         height=12,
+                         num_agents=2)
 
 register(
     id='MiniGrid-MultiAgent-Empty-6x6-N2-v0',
     entry_point='gym_minigrid.envs:MAEmptyEnv6x6'
+)
+
+register(
+    id='MiniGrid-MultiAgent-Empty-12x12-N2-v0',
+    entry_point='gym_minigrid.envs:MAEmptyEnv12x12'
 )
