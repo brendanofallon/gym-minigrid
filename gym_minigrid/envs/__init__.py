@@ -23,3 +23,4 @@ from gym_minigrid.envs.distshift import *
 from gym_minigrid.envs.multiagent_empty import *
 from gym_minigrid.envs.multiagent_multiroom import *
 from gym_minigrid.envs.multiagent_multigoal import *
+from gym_minigrid.envs.foxandsheep import *

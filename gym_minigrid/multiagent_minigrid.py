@@ -11,8 +11,6 @@ from gym_minigrid import minigrid
 from .rendering import *
 
 
-
-
 class Agent(minigrid.WorldObj):
 
     count = 0
@@ -527,7 +525,7 @@ class MultiAgentMiniGridEnv(gym.Env):
         reward = 0
         done = False
         ai = self.agents.index(agent)
-        print(f"Agent {ai} (cur_pos: {agent.cur_pos}) is executing action {action}")
+        # print(f"Agent {ai} (cur_pos: {agent.cur_pos}) is executing action {action}")
         # Get the position in front of the agent
         fwd_pos = agent.front_pos
 
