@@ -150,9 +150,8 @@ class FoxAndSheep(MAMultiGoalEnv):
 
         if action == self.actions.forward:
             if is_fox and fwd_cell in self.sheep:
-                print(f"Eating a sheep!!")
                 reward = 1.0
-                # TODO: Somehow remove this sheep?!??
+                done = True
 
             if fwd_cell is None or fwd_cell.can_overlap():
                 self.grid.set(*agent.cur_pos, None)
