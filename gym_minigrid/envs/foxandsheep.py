@@ -146,6 +146,7 @@ class FoxAndSheep(MAMultiGoalEnv):
 
         # Update the agent's position/direction
         obs, reward, done, info = MultiAgentMiniGridEnv.step(self, agent, action)
+        reward = 0.0
         done = False
 
         if action == self.actions.forward:
