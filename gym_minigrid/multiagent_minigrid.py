@@ -25,6 +25,7 @@ class Agent(minigrid.WorldObj):
         self.dir = None
         self.carrying = None
         self.view_size = 7
+        self.reward_mod = 0.0
 
     def encode(self):
         """Encode the a description of this object as a 3-tuple of integers"""

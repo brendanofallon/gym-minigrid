@@ -16,7 +16,7 @@ COLORS = {
     'orange': np.array([230, 153, 0]),
     'red'   : np.array([255, 0, 0]),
     'green' : np.array([0, 255, 0]),
-    'blue'  : np.array([0, 0, 255]),
+    'blue'  : np.array([0, 150, 255]),
     'purple': np.array([112, 39, 195]),
     'yellow': np.array([255, 255, 0]),
     'grey'  : np.array([100, 100, 100])

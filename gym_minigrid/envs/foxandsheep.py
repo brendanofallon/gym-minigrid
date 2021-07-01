@@ -151,8 +151,10 @@ class FoxAndSheep(MAMultiGoalEnv):
 
         if action == self.actions.forward:
             if is_fox and fwd_cell in self.sheep:
+                whichsheep = self.sheep[self.sheep.index(fwd_cell)]
                 reward = 1.0
                 done = True
+                whichsheep.reward_mod = -1.0
 
             if fwd_cell is None or fwd_cell.can_overlap():
                 self.grid.set(*agent.cur_pos, None)
@@ -168,6 +170,8 @@ class FoxAndSheep(MAMultiGoalEnv):
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
 
+        reward += agent.reward_mod
+        agent.reward_mod = 0
         done = done or (self.step_count == self.max_steps) or (self.goals_consumed == self.numGoals)
         return obs, reward, done, info
 
