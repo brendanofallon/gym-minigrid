@@ -161,11 +161,15 @@ class FoxAndSheep(MAMultiGoalEnv):
                 agent.cur_pos = fwd_pos
                 self.grid.set(*agent.cur_pos, agent)
 
-            if is_sheep and fwd_cell != None and fwd_cell.type == 'goal':
-                reward = 1.0 / self.numGoals * self._reward()
-                # Make the goal disappear
-                self.grid.set(*fwd_pos, None)
-                self.goals_consumed += 1
+            if is_sheep and fwd_cell != None:
+                if fwd_cell.type == 'goal':
+                    reward = 1.0 / self.numGoals * self._reward()
+                    # Make the goal disappear
+                    self.grid.set(*fwd_pos, None)
+                    self.goals_consumed += 1
+                if fwd_cell in self.foxes:
+                    reward = -1.0
+                    done = True
 
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
