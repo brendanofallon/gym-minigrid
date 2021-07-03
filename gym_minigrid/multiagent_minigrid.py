@@ -7,6 +7,7 @@ from gym import error, spaces, utils
 from gym.utils import seeding
 
 from gym_minigrid import minigrid
+from .minigrid import WorldObj, COLORS, OBJECT_TO_IDX, COLOR_TO_IDX
 
 from .rendering import *
 
@@ -104,6 +105,23 @@ class Agent(minigrid.WorldObj):
         vy = -(dx*lx + dy*ly)
 
         return vx, vy
+
+
+class Grass(WorldObj):
+
+    def __init__(self, init_nrg=10):
+        super().__init__('grass', 'green')
+        self.nrg = init_nrg
+
+    def can_overlap(self):
+        return True
+
+    def render(self, img):
+        fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
+
+    def encode(self):
+        """Encode the a description of this object as a 3-tuple of integers"""
+        return (OBJECT_TO_IDX[self.type], COLOR_TO_IDX[self.color], self.nrg)
 
 
 class MultiAgentMiniGridEnv(gym.Env):

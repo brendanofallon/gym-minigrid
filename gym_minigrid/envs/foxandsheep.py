@@ -1,7 +1,7 @@
 import random
 
 from gym_minigrid.minigrid import Grid, Wall, COLOR_NAMES, Door, Goal
-from gym_minigrid.multiagent_minigrid import MultiAgentMiniGridEnv, Agent
+from gym_minigrid.multiagent_minigrid import MultiAgentMiniGridEnv, Agent, Grass
 
 from gym_minigrid.envs import MAMultiGoalEnv
 from gym_minigrid.register import register
@@ -16,7 +16,8 @@ class FoxAndSheep(MAMultiGoalEnv):
                  maxRoomSize=10,
                  numGoals=3,
                  num_foxes=1,
-                 num_sheep=1):
+                 num_sheep=1,
+                 grid_size=25):
 
         self.num_foxes = num_foxes
         self.num_sheep = num_sheep
@@ -29,6 +30,7 @@ class FoxAndSheep(MAMultiGoalEnv):
             numGoals=numGoals,
             doorsOpen=True,
             init_num_agents=num_sheep + num_foxes,
+            grid_size=grid_size,
         )
 
     def _gen_grid(self, width, height):
@@ -119,13 +121,25 @@ class FoxAndSheep(MAMultiGoalEnv):
             self.sheep.append(a)
             self.place_agent(a, roomList[0].top, roomList[0].size)
 
-        for g in range(self.numGoals):
-            #pick a random room...
-            room = random.choice(roomList)
-            try:
-                self.goal_pos = self.place_obj(Goal(), room.top, room.size, max_tries=1000)
-            except RecursionError:
-                pass
+        # for g in range(self.numGoals):
+        #     #pick a random room...
+        #     room = random.choice(roomList)
+        #     try:
+        #         self.place_obj(Goal(), room.top, room.size, max_tries=1000)
+        #     except RecursionError:
+        #         pass
+
+        for g in range(20):
+            clumpsize = 5
+            topxy = (1, 1)
+            size = (self.grid.width, self.grid.height)
+            for i in range(clumpsize):
+                try:
+                    pos = self.place_obj(Grass(), topxy, size, max_tries=1000)
+                    size = (3, 3)
+                    topxy = (max(1, pos[0]-1), max(1, pos[1]-1))
+                except RecursionError:
+                    pass
 
         self.mission = 'traverse the rooms to get to the goals'
 
@@ -149,6 +163,14 @@ class FoxAndSheep(MAMultiGoalEnv):
         reward = 0.0
         done = False
 
+        if is_sheep and action == self.actions.pickup:
+            # Pickup means 'eat', as in eat the grass
+            if type(fwd_cell) == Grass:
+                reward = 0.1
+                fwd_cell.nrg -= 1
+                if fwd_cell.nrg <= 0:
+                    self.grid.set(*fwd_cell, None)
+
         if action == self.actions.forward:
             if is_fox and fwd_cell in self.sheep:
                 whichsheep = self.sheep[self.sheep.index(fwd_cell)]
@@ -167,6 +189,7 @@ class FoxAndSheep(MAMultiGoalEnv):
                     # Make the goal disappear
                     self.grid.set(*fwd_pos, None)
                     self.goals_consumed += 1
+
                 if fwd_cell in self.foxes:
                     reward = -1.0
                     done = True

@@ -26,6 +26,7 @@ class MAMultiRoomEnv(MultiAgentMiniGridEnv):
         maxRoomSize=10,
         doorsOpen=False,
         init_num_agents=2,
+        grid_size=25,
     ):
         assert minNumRooms > 0
         assert maxNumRooms >= minNumRooms
@@ -39,7 +40,7 @@ class MAMultiRoomEnv(MultiAgentMiniGridEnv):
         self.rooms = []
 
         super(MAMultiRoomEnv, self).__init__(
-            grid_size=25,
+            grid_size=grid_size,
             max_steps=self.maxNumRooms * 20,
             init_num_agents=init_num_agents,
         )

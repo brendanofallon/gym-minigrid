@@ -20,6 +20,7 @@ class MAMultiGoalEnv(MAMultiRoomEnv):
         numGoals=3,
         doorsOpen=True,
         init_num_agents=2,
+        grid_size=25,
     ):
         assert minNumRooms > 0
         assert maxNumRooms >= minNumRooms
@@ -39,6 +40,7 @@ class MAMultiGoalEnv(MAMultiRoomEnv):
             maxRoomSize,
             doorsOpen=doorsOpen,
             init_num_agents=init_num_agents,
+            grid_size=grid_size,
         )
 
     def _gen_grid(self, width, height):

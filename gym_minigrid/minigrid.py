@@ -51,6 +51,7 @@ OBJECT_TO_IDX = {
     'goal'          : 8,
     'lava'          : 9,
     'agent'         : 10,
+    'grass'         : 11,
 }
 
 IDX_TO_OBJECT = dict(zip(OBJECT_TO_IDX.values(), OBJECT_TO_IDX.keys()))
@@ -155,7 +156,9 @@ class WorldObj:
         """Draw this object with the given renderer"""
         raise NotImplementedError
 
+
 class Goal(WorldObj):
+
     def __init__(self):
         super().__init__('goal', 'green')
 
@@ -164,6 +167,7 @@ class Goal(WorldObj):
 
     def render(self, img):
         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
+
 
 class Floor(WorldObj):
     """
@@ -381,8 +385,8 @@ class Grid:
         self.grid[j * self.width + i] = v
 
     def get(self, i, j):
-        assert i >= 0 and i < self.width
-        assert j >= 0 and j < self.height
+        assert i >= 0 and i < self.width, f"i was {i}, must be < {self.width}"
+        assert j >= 0 and j < self.height, f"j was {j}, must be < {self.height}"
         return self.grid[j * self.width + i]
 
     def horz_wall(self, x, y, length=None, obj_type=Wall):
@@ -446,7 +450,8 @@ class Grid:
         agent_dir=None,
         highlight=False,
         tile_size=TILE_PIXELS,
-        subdivs=3
+        subdivs=3,
+        skip_cache=False,
     ):
         """
         Render a tile and cache the result
@@ -456,7 +461,7 @@ class Grid:
         key = (agent_dir, highlight, tile_size)
         key = obj.encode() + key if obj else key
 
-        if key in cls.tile_cache:
+        if not skip_cache and key in cls.tile_cache:
             return cls.tile_cache[key]
 
         img = np.zeros(shape=(tile_size * subdivs, tile_size * subdivs, 3), dtype=np.uint8)
@@ -488,6 +493,7 @@ class Grid:
         img = downsample(img, subdivs)
 
         # Cache the rendered tile
+
         cls.tile_cache[key] = img
 
         return img
@@ -508,6 +514,7 @@ class Grid:
         if highlight_mask is None:
             highlight_mask = np.zeros(shape=(self.width, self.height), dtype=np.bool)
 
+        print(f"Rendering with tile_size {tile_size}")
         # Compute the total grid size
         width_px = self.width * tile_size
         height_px = self.height * tile_size
@@ -524,7 +531,7 @@ class Grid:
                     cell,
                     agent_dir=agent_dir if agent_here else None,
                     highlight=highlight_mask[i, j],
-                    tile_size=tile_size
+                    tile_size=tile_size,
                 )
 
                 ymin = j * tile_size
