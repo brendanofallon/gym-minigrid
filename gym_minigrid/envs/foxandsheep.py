@@ -221,6 +221,23 @@ register(
     entry_point='gym_minigrid.envs:FoxAndSheepEmpty6x6'
 )
 
+class FoxAndSheepJustSheep(FoxAndSheep):
+
+    def __init__(self):
+        super().__init__(
+            minNumRooms=1,
+            maxNumRooms=1,
+            maxRoomSize=12,
+            numGoals=4,
+            num_sheep=1,
+            num_foxes=0,
+        )
+
+register(
+    id='MiniGrid-FoxAndSheep-JustSheep-v0',
+    entry_point='gym_minigrid.envs:FoxAndSheepJustSheep'
+)
+
 class FoxAndSheepEmpty12x12(FoxAndSheep):
 
     def __init__(self):
