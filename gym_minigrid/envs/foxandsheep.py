@@ -129,10 +129,10 @@ class FoxAndSheep(MAMultiGoalEnv):
         #     except RecursionError:
         #         pass
 
-        for g in range(20):
+        for g in range(1):
             clumpsize = 5
-            topxy = (1, 1)
-            size = (self.grid.width, self.grid.height)
+            topxy = self.rooms[0].top
+            size = self.rooms[0].size
             for i in range(clumpsize):
                 try:
                     pos = self.place_obj(Grass(), topxy, size, max_tries=1000)
