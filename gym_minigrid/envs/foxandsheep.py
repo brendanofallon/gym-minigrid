@@ -112,24 +112,18 @@ class FoxAndSheep(MAMultiGoalEnv):
         for i in range(self.num_foxes):
             a = Agent()
             a.color = 'red'
+            ri = self._rand_int(0, len(self.rooms))
             self.agents.append(a)
             self.foxes.append(a)
-            self.place_agent(a, roomList[0].top, roomList[0].size)
+            self.place_agent(a, roomList[ri].top, roomList[ri].size)
 
         for i in range(self.num_sheep):
             a = Agent()
             a.color = 'blue'
+            ri = self._rand_int(0, len(self.rooms))
             self.agents.append(a)
             self.sheep.append(a)
-            self.place_agent(a, roomList[0].top, roomList[0].size)
-
-        # for g in range(self.numGoals):
-        #     #pick a random room...
-        #     room = random.choice(roomList)
-        #     try:
-        #         self.place_obj(Goal(), room.top, room.size, max_tries=1000)
-        #     except RecursionError:
-        #         pass
+            self.place_agent(a, roomList[ri].top, roomList[ri].size)
 
         for g in range(2):
             clumpsize = 2
