@@ -17,10 +17,12 @@ class FoxAndSheep(MAMultiGoalEnv):
                  numGoals=3,
                  num_foxes=1,
                  num_sheep=1,
-                 grid_size=25):
+                 grid_size=25,
+                 grass_growth_rate=0.1):
 
         self.num_foxes = num_foxes
         self.num_sheep = num_sheep
+        self.grass_growth_rate = grass_growth_rate
         self.foxes = []
         self.sheep = []
         super(FoxAndSheep, self).__init__(
@@ -129,19 +131,22 @@ class FoxAndSheep(MAMultiGoalEnv):
         #     except RecursionError:
         #         pass
 
-        for g in range(1):
-            clumpsize = 5
-            topxy = self.rooms[0].top
-            size = self.rooms[0].size
-            for i in range(clumpsize):
-                try:
-                    pos = self.place_obj(Grass(), topxy, size, max_tries=1000)
-                    size = (3, 3)
-                    topxy = (max(1, pos[0]-1), max(1, pos[1]-1))
-                except RecursionError:
-                    pass
+        for g in range(2):
+            clumpsize = 2
+            self._place_grass(clumpsize)
 
         self.mission = 'traverse the rooms to get to the goals'
+
+    def _place_grass(self, clumpsize=1):
+        ri = self._rand_int(0, len(self.rooms))
+        topxy = self.rooms[ri].top
+        size = self.rooms[ri].size
+        for i in range(clumpsize):
+            try:
+                pos = self.place_obj(Grass(init_nrg=self._rand_int(2,8)), topxy, size, max_tries=1000)
+            except RecursionError:
+                pass
+
 
     def step(self, agent, action):
         # Invalid action
@@ -169,7 +174,7 @@ class FoxAndSheep(MAMultiGoalEnv):
                 reward = 0.1
                 fwd_cell.nrg -= 1
                 if fwd_cell.nrg <= 0:
-                    self.grid.set(*fwd_cell, None)
+                    self.grid.set(*fwd_pos, None)
 
         if action == self.actions.forward:
             if is_fox and fwd_cell in self.sheep:
@@ -196,6 +201,9 @@ class FoxAndSheep(MAMultiGoalEnv):
 
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
+
+        if self._rand_float() < self.grass_growth_rate:
+            self._place_grass(1)
 
         reward += agent.reward_mod
         agent.reward_mod = 0
