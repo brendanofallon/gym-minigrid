@@ -18,7 +18,7 @@ class FoxAndSheep(MAMultiGoalEnv):
                  num_foxes=1,
                  num_sheep=1,
                  grid_size=25,
-                 grass_growth_rate=0.1):
+                 grass_growth_rate=0.0):
 
         self.num_foxes = num_foxes
         self.num_sheep = num_sheep
@@ -202,7 +202,7 @@ class FoxAndSheep(MAMultiGoalEnv):
             if fwd_cell != None and fwd_cell.type == 'lava':
                 done = True
 
-        if self._rand_float() < self.grass_growth_rate:
+        if self._rand_float(0, 1.0) < self.grass_growth_rate:
             self._place_grass(1)
 
         reward += agent.reward_mod
@@ -221,6 +221,7 @@ class FoxAndSheepEmpty6x6(FoxAndSheep):
             numGoals=3,
             num_sheep=1,
             num_foxes=1,
+            grass_growth_rate=0.01,
         )
 
 
@@ -239,6 +240,7 @@ class FoxAndSheepJustSheep(FoxAndSheep):
             numGoals=4,
             num_sheep=1,
             num_foxes=0,
+            grass_growth_rate=0.02,
         )
 
 register(
@@ -256,6 +258,7 @@ class FoxAndSheepEmpty12x12(FoxAndSheep):
             numGoals=4,
             num_sheep=1,
             num_foxes=1,
+            grass_growth_rate=0.02,
         )
 
 register(
@@ -274,6 +277,7 @@ class FoxAndSheep3Room(FoxAndSheep):
             numGoals=6,
             num_sheep=1,
             num_foxes=1,
+            grass_growth_rate=0.03,
         )
 
 register(
