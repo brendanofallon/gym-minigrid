@@ -9,7 +9,47 @@ from gym_minigrid.multiagent_minigrid import MultiAgentMiniGridEnv, Agent, Grass
 from gym_minigrid.envs import MAMultiGoalEnv, FoxAndSheep
 from gym_minigrid.register import register
 
-from itertools import combinations
+
+def _split_partition(grid, top, size):
+    topx, topy = top
+    width, height = size
+    min_size = 25
+    if height > min_size:
+        if width > min_size:
+            splittype = 'vert' if width > height else 'horz'
+        else:
+            splittype = 'horz'
+    else:
+        if width > min_size:
+            splittype = 'vert'
+        else:
+            return []
+
+    if splittype == 'horz':
+        split_h = np.random.randint(4, max(5, height - 5))
+        wall_len = np.random.randint(4, max(5, width - 2))
+        if np.random.rand() < 0.5:
+            grid.horz_wall(width-1, split_h, length=-1*wall_len)
+        else:
+            grid.horz_wall(topx, split_h, length=wall_len)
+        # print(f"Horz partition with wall at {topx}, {split_h} length: {wall_len}")
+        return [
+            (top, (width, split_h-1)),
+            ((topx, split_h), (width, height - split_h))
+        ]
+    else:
+        split_w = np.random.randint(4, max(5, width - 5))
+        wall_len =  np.random.randint(4, max(5, height - 2))
+        if np.random.rand() < 0.5:
+            grid.vert_wall(split_w, topy, length=wall_len)
+        else:
+            grid.vert_wall(split_w, height-1, length=-1 * wall_len)
+        # print(f"Vert partition with wall at {split_w}, {topy}, length: {wall_len}")
+        return [
+            (top, (split_w, height)),
+            ((split_w+1, topy), (width - split_w, height))
+        ]
+
 
 
 class FoxAndSheepBigHouse(FoxAndSheep):
@@ -33,6 +73,41 @@ class FoxAndSheepBigHouse(FoxAndSheep):
         )
 
     def _gen_grid(self, width, height):
+        self.goals_consumed = 0
+        self.foxes = []
+        self.sheep = []
+
+        # Create the grid
+        self.grid = Grid(width, height)
+
+        # Generate the surrounding walls
+        self.grid.wall_rect(0, 0, width, height)
+        partition_stack = [((0,0), (width, height))]
+        self.mission = "dont get eaten"
+        while len(partition_stack):
+            room = partition_stack.pop()
+            newrooms = _split_partition(self.grid, room[0], room[1])
+            for newroom in newrooms:
+                # self.grid.wall_rect(*newroom[0], *newroom[1])
+                partition_stack.append(newroom)
+                self.render()
+
+        for i in range(self.width // 5):
+            self._place_grass(clumpsize=4)
+
+
+    def _place_grass(self, clumpsize=1):
+        pos = (1, 1)
+        size = (self.width - 1, self.height-1)
+        for i in range(clumpsize):
+            try:
+                pos = self.place_obj(Grass(init_nrg=self._rand_int(2,8)), pos, size, max_tries=1000)
+                size = (3, 3)
+            except RecursionError:
+                pass
+
+
+    def _gen_grid_snakes(self, width, height):
         self.goals_consumed = 0
         self.foxes = []
         self.sheep = []
@@ -143,10 +218,9 @@ register(
 )
 
 
-if __name__=="__main__":
-    import time
-    env = FoxAndSheepBigHouse()
-    env.seed(np.random.randint(0, 1000))
-    env.reset()
-    env.render()
-    time.sleep(1000)
+# if __name__=="__main__":
+#     import time
+#     env = FoxAndSheepBigHouse()
+#     env.seed(np.random.randint(0, 1000))
+#     env.render()
+#     time.sleep(1000)

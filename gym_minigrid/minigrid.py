@@ -392,13 +392,13 @@ class Grid:
     def horz_wall(self, x, y, length=None, obj_type=Wall):
         if length is None:
             length = self.width - x
-        for i in range(0, length):
+        for i in range(0, length, 1 if length > 0 else -1):
             self.set(x + i, y, obj_type())
 
     def vert_wall(self, x, y, length=None, obj_type=Wall):
         if length is None:
             length = self.height - y
-        for j in range(0, length):
+        for j in range(0, length, 1 if length > 0 else -1):
             self.set(x, y + j, obj_type())
 
     def wall_rect(self, x, y, w, h):
@@ -514,7 +514,6 @@ class Grid:
         if highlight_mask is None:
             highlight_mask = np.zeros(shape=(self.width, self.height), dtype=np.bool)
 
-        print(f"Rendering with tile_size {tile_size}")
         # Compute the total grid size
         width_px = self.width * tile_size
         height_px = self.height * tile_size

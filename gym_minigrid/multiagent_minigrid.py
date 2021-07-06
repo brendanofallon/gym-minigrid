@@ -114,7 +114,7 @@ class Grass(WorldObj):
         self.nrg = init_nrg
 
     def can_overlap(self):
-        return True
+        return False
 
     def render(self, img):
         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
