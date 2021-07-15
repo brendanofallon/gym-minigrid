@@ -1,10 +1,24 @@
 import random
 
+from gym_minigrid import minigrid
+
 from gym_minigrid.minigrid import Grid, Wall, COLOR_NAMES, Door, Goal
 from gym_minigrid.multiagent_minigrid import MultiAgentMiniGridEnv, Agent, Grass
 
 from gym_minigrid.envs import MAMultiGoalEnv
 from gym_minigrid.register import register
+
+
+class Fox(Agent):
+
+    def __init__(self):
+        super().__init__('fox', view_size=7, color='red')
+
+
+class Sheep(Agent):
+
+    def __init__(self):
+        super().__init__('sheep', view_size=7, color='blue')
 
 
 class FoxAndSheep(MAMultiGoalEnv):
@@ -77,7 +91,6 @@ class FoxAndSheep(MAMultiGoalEnv):
 
         # For each room
         for idx, room in enumerate(roomList):
-
             topX, topY = room.top
             sizeX, sizeY = room.size
 
@@ -110,16 +123,14 @@ class FoxAndSheep(MAMultiGoalEnv):
 
         # Randomize the starting agent position and direction
         for i in range(self.num_foxes):
-            a = Agent()
-            a.color = 'red'
+            a = Fox()
             ri = self._rand_int(0, len(self.rooms))
             self.agents.append(a)
             self.foxes.append(a)
             self.place_agent(a, roomList[ri].top, roomList[ri].size)
 
         for i in range(self.num_sheep):
-            a = Agent()
-            a.color = 'blue'
+            a = Sheep()
             ri = self._rand_int(0, len(self.rooms))
             self.agents.append(a)
             self.sheep.append(a)

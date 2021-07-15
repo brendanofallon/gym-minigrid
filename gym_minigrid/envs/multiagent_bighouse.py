@@ -6,7 +6,7 @@ import numpy as np
 from gym_minigrid.minigrid import Grid, Wall, COLOR_NAMES, Door, Goal
 from gym_minigrid.multiagent_minigrid import MultiAgentMiniGridEnv, Agent, Grass
 
-from gym_minigrid.envs import MAMultiGoalEnv, FoxAndSheep
+from gym_minigrid.envs import MAMultiGoalEnv, FoxAndSheep, Fox, Sheep
 from gym_minigrid.register import register
 
 
@@ -58,18 +58,21 @@ class FoxAndSheepBigHouse(FoxAndSheep):
                  numGoals=25,
                  num_foxes=2,
                  num_sheep=10,
-                 grid_size=40):
+                 grid_size=40,
+                 grass_growth_rate=0.05):
 
         self.num_foxes = num_foxes
         self.num_sheep = num_sheep
         self.foxes = []
         self.sheep = []
-        super(FoxAndSheep, self).__init__(
-            1, 1, 10, # ignored
+        super(FoxAndSheepBigHouse, self).__init__(
+            1, 1,
+            maxRoomSize=10, # ignored
             numGoals=numGoals,
-            doorsOpen=True,
-            init_num_agents=num_sheep + num_foxes,
+            num_foxes=num_foxes,
+            num_sheep=num_sheep,
             grid_size=grid_size,
+            grass_growth_rate=grass_growth_rate,
         )
 
     def _gen_grid(self, width, height):
@@ -90,7 +93,20 @@ class FoxAndSheepBigHouse(FoxAndSheep):
             for newroom in newrooms:
                 # self.grid.wall_rect(*newroom[0], *newroom[1])
                 partition_stack.append(newroom)
-                self.render()
+                # self.render()
+
+        # Randomize the starting agent position and direction
+        for i in range(self.num_foxes):
+            a = Fox()
+            self.agents.append(a)
+            self.foxes.append(a)
+            self.place_agent(a, (1,1), (width-1, height-1))
+
+        for i in range(self.num_sheep):
+            a = Sheep()
+            self.agents.append(a)
+            self.sheep.append(a)
+            self.place_agent(a, (1,1), (width-1, height-1))
 
         for i in range(self.width // 5):
             self._place_grass(clumpsize=4)

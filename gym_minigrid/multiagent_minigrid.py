@@ -20,12 +20,12 @@ class Agent(minigrid.WorldObj):
         cls.count += 1
         return super(Agent, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, color=None):
+    def __init__(self, view_size=7, color=None):
         super().__init__('agent', minigrid.COLOR_NAMES[Agent.count % len(minigrid.COLOR_NAMES)])
         self.count = Agent.count
         self.dir = None
         self.carrying = None
-        self.view_size = 7
+        self.view_size = view_size
         self.reward_mod = 0.0
 
     def encode(self):
