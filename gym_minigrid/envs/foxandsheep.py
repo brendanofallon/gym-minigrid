@@ -185,7 +185,6 @@ class FoxAndSheep(MAMultiGoalEnv):
             if is_fox and fwd_cell in self.sheep:
                 whichsheep = self.sheep[self.sheep.index(fwd_cell)]
                 reward = 1.0
-                done = True
                 whichsheep.reward_mod = -1.0
 
             if fwd_cell is None or fwd_cell.can_overlap():
