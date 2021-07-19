@@ -63,7 +63,7 @@ class MAMultiRoomEnv(MultiAgentMiniGridEnv):
             self._placeRoom(
                 numRooms,
                 roomList=curRoomList,
-                minSz=4,
+                minSz=6,
                 maxSz=self.maxRoomSize,
                 entryDoorWall=2,
                 entryDoorPos=entryDoorPos
