@@ -201,10 +201,6 @@ class FoxAndSheep(MAMultiGoalEnv):
 
                 if fwd_cell in self.foxes:
                     reward = -1.0
-                    done = True
-
-            if fwd_cell != None and fwd_cell.type == 'lava':
-                done = True
 
         if self._rand_float(0, 1.0) < self.grass_growth_rate:
             self._place_grass(1)
